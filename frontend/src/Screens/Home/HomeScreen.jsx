@@ -11,11 +11,11 @@ import MySlider from "./MySlider";
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "FETCH_REQUEST":
+    case "FETCH_REQUEST":  // obtener respuesta
       return { ...state, loading: true };
-    case "FETCH_SUCCESS":
+    case "FETCH_SUCCESS": // exito
       return { ...state, products: action.payload, loading: false };
-    case "FETCH_FAIL":
+    case "FETCH_FAIL": // eror al buscar
       return { ...state, loading: false, error: action.payload };
     default:
       return state;
