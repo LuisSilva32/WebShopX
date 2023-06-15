@@ -34,6 +34,7 @@ export default function OrderListScreen() {
     error: "",
   });
 
+  // Obtener órdenes
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,9 +56,9 @@ export default function OrderListScreen() {
   return (
     <div>
       <Helmet>
-        <title>Ordenes</title>
+        <title>Órdenes</title>
       </Helmet>
-      <h1>Ordenes</h1>
+      <h1>Órdenes</h1>
       {loading ? (
         <LoadingBox></LoadingBox>
       ) : error ? (
@@ -79,7 +80,7 @@ export default function OrderListScreen() {
             {orders.map((order) => (
               <tr key={order._id}>
                 <td>{order._id}</td>
-                <td>{order.user ? order.user.name : "DELETED USER"}</td>
+                <td>{order.user ? order.user.name : "USUARIO ELIMINADO"}</td>
                 <td>{order.createdAt.substring(0, 10)}</td>
                 <td>{order.totalPrice.toFixed(2)}</td>
                 <td>{order.isPaid ? order.paidAt.substring(0, 10) : "No"}</td>

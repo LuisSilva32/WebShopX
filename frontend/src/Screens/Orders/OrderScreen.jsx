@@ -25,6 +25,7 @@ function reducer(state, action) {
       return state;
   }
 }
+
 export default function OrderScreen() {
   const { state } = useContext(Store);
   const { userInfo } = state;
@@ -60,7 +61,6 @@ export default function OrderScreen() {
     }
   }, [order, userInfo, orderId, navigate]);
 
-  //Retornamos todo en la pagina
   return loading ? (
     <LoadingBox></LoadingBox>
   ) : error ? (
@@ -73,6 +73,7 @@ export default function OrderScreen() {
       <h1 className="my-3">Compra: {orderId}</h1>
       <Row>
         <Col md={8}>
+          {/* Información de envío */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Envío:</Card.Title>
@@ -91,6 +92,7 @@ export default function OrderScreen() {
               )}
             </Card.Body>
           </Card>
+          {/* Información del método de pago */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Metodo:</Card.Title>
@@ -102,11 +104,11 @@ export default function OrderScreen() {
                   Fecha de pago: {order.paidAt}
                 </MessageBox>
               ) : (
-                <MessageBox variant="danger">Estado: !No pagado!</MessageBox>
+                <MessageBox variant="danger">Estado: ¡No pagado!</MessageBox>
               )}
             </Card.Body>
           </Card>
-
+          {/* Lista de artículos */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Artículos:</Card.Title>
@@ -139,6 +141,7 @@ export default function OrderScreen() {
           </Card>
         </Col>
         <Col md={4}>
+          {/* Resumen del pedido */}
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Resumen del pedido</Card.Title>

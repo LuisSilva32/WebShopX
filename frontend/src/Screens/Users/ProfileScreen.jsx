@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { getError } from "../../Components/Error";
 import axios from "axios";
 
+// Definición del reducer para manejar el estado
 const reducer = (state, action) => {
   switch (action.type) {
     case "UPDATE_REQUEST":
@@ -15,27 +16,32 @@ const reducer = (state, action) => {
       return { ...state, loadingUpdate: false };
     case "UPDATE_FAIL":
       return { ...state, loadingUpdate: false };
-
     default:
       return state;
   }
 };
 
 export default function ProfileScreen() {
+  // Obtener el estado global y el despachador del contexto
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
+
+  // Establecer los estados locales para los campos del formulario
   const [name, setName] = useState(userInfo.name);
   const [email, setEmail] = useState(userInfo.email);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Utilizar el reducer para manejar el estado local
   const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
     loadingUpdate: false,
   });
 
+  // Manejador del envío del formulario
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
+      // Enviar una solicitud PUT al servidor para actualizar el perfil del usuario
       const { data } = await axios.put(
         "/api/users/profile",
         {
@@ -47,16 +53,21 @@ export default function ProfileScreen() {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         }
       );
+      // Actualizar el estado local y global después de una actualización exitosa
       dispatch({
         type: "UPDATE_SUCCESS",
       });
       ctxDispatch({ type: "USER_SIGNIN", payload: data });
+      // Guardar la información del usuario actualizada en el almacenamiento local
       localStorage.setItem("userInfo", JSON.stringify(data));
+      // Mostrar una notificación de éxito
       toast.success("User updated successfully");
     } catch (err) {
+      // Manejar el error en caso de fallo de la solicitud
       dispatch({
         type: "FETCH_FAIL",
       });
+      // Mostrar una notificación de error con el mensaje de error correspondiente
       toast.error(getError(err));
     }
   };

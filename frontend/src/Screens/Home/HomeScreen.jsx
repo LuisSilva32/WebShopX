@@ -28,6 +28,7 @@ function HomeScreen() {
     loading: true,
     error: "",
   });
+
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: "FETCH_REQUEST" });
@@ -40,6 +41,7 @@ function HomeScreen() {
     };
     fetchData();
   }, []);
+
   return (
     <div>
       <Helmet>
@@ -67,4 +69,5 @@ function HomeScreen() {
     </div>
   );
 }
+
 export default HomeScreen;

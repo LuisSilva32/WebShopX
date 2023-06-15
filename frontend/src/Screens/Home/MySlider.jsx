@@ -7,6 +7,9 @@ function MySlider() {
   return (
     <div id="mySlider" className="carousel slide" data-bs-ride="carousel">
       <div className="carousel-inner">
+        {/* Los siguientes divs representan los diferentes elementos del carrusel */}
+        {/* La clase 'carousel-item' indica que es un elemento del carrusel */}
+        {/* El primer elemento tiene la clase 'active' para mostrarlo al cargar la página */}
         <div className="carousel-item active">
           <img
             src="Images/image1.jpg"
@@ -32,34 +35,40 @@ function MySlider() {
           <img
             src="Images/image4.jpg"
             className="d-block w-100"
-            alt="Slide 3"
+            alt="Slide 4"
           />
         </div>
         <div className="carousel-item">
           <img
             src="Images/image5.jpg"
             className="d-block w-100"
-            alt="Slide 3"
+            alt="Slide 5"
           />
         </div>
       </div>
+      {/* Botón para navegar al slide anterior */}
       <button
         className="carousel-control-prev"
         type="button"
         data-bs-target="#mySlider"
         data-bs-slide="prev"
       >
+        {/* Icono para el botón de navegación */}
         <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span className="visually-hidden">Previous</span>
+        {/* Texto alternativo para accesibilidad */}
+        <span className="visually-hidden">Anterior</span>
       </button>
+      {/* Botón para navegar al siguiente slide */}
       <button
         className="carousel-control-next"
         type="button"
         data-bs-target="#mySlider"
         data-bs-slide="next"
       >
+        {/* Icono para el botón de navegación */}
         <span className="carousel-control-next-icon" aria-hidden="true"></span>
-        <span className="visually-hidden">Next</span>
+        {/* Texto alternativo para accesibilidad */}
+        <span className="visually-hidden">Siguiente</span>
       </button>
     </div>
   );

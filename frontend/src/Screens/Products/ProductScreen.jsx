@@ -18,7 +18,7 @@ import FloatingLabel from "react-bootstrap/FloatingLabel";
 import { toast } from "react-toastify";
 import "./Styles.css"
 
-
+// Función reductora para gestionar el estado del componente
 const reducer = (state, action) => {
   switch (action.type) {
     case "REFRESH_PRODUCT":
@@ -41,21 +41,27 @@ const reducer = (state, action) => {
 };
 
 function ProductScreen() {
+  // Referencia a los comentarios (para realizar scroll)
   let reviewsRef = useRef();
 
+  // Estado local para la calificación y el comentario
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
+  // Hook 'useNavigate' para la navegación programática
   const navigate = useNavigate();
   const params = useParams();
   const { slug } = params;
 
+  // Hook 'useReducer' para gestionar el estado del componente
   const [{ loading, error, product, loadingCreateReview }, dispatch] =
     useReducer(reducer, {
       product: [],
       loading: true,
       error: "",
     });
+
+  // Efecto para obtener los detalles del producto al cargar el componente
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: "FETCH_REQUEST" });
@@ -69,16 +75,18 @@ function ProductScreen() {
     fetchData();
   }, [slug]);
 
+  // Obtener el estado y el despachador del contexto usando 'useContext'
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
+
+  // Controlador para agregar el producto al carrito
   const addToCartHandler = async () => {
-    const existItem = cart.cartItems.find((x) => x._id === product._id); // verificamos si el producto ya se encuentra en el carrito por medio del id
-    const quantity = existItem ? existItem.quantity + 1 : 1; //aumentamos la cantidad de 1 en 1 al momento de hacer click en el boton, de lo contrsrio lo deja en 1
+    const existItem = cart.cartItems.find((x) => x._id === product._id);
+    const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`/api/products/${product._id}`);
 
     if (data.countInStock < quantity) {
-      //verificamos si el producto se encuentra disponible atravez del stock
-      window.alert("Lo sentimos... El producto se encuentra agotado :( "); // si no es asi enviamos el mensaje
+      window.alert("Lo sentimos... El producto se encuentra agotado :(");
       return;
     }
     ctxDispatch({
@@ -88,6 +96,7 @@ function ProductScreen() {
     navigate("/cart");
   };
 
+  // Controlador para enviar la reseña del producto
   const submitHandler = async (e) => {
     e.preventDefault();
     if (!comment || !rating) {
@@ -106,7 +115,7 @@ function ProductScreen() {
       dispatch({
         type: "CREATE_SUCCESS",
       });
-      toast.success("¡Reseña publicada con exito!");
+      toast.success("¡Reseña publicada con éxito!");
       product.reviews.unshift(data.review);
       product.numReviews = data.numReviews;
       product.rating = data.rating;
@@ -151,7 +160,7 @@ function ProductScreen() {
             </ListGroup.Item>
             <ListGroup.Item>Precio: ${product.price}</ListGroup.Item>
             <ListGroup.Item>
-              Descripcion:
+              Descripción:
               <p>{product.description}</p>
             </ListGroup.Item>
           </ListGroup>
@@ -218,7 +227,7 @@ function ProductScreen() {
               <h2>¡Deja tu reseña del producto aquí!</h2>
               <Form.Group className="mb-3" controlId="rating">
                 <Form.Label>
-                  Selecciona la calificación y deja tú comentario
+                  Selecciona la calificación y deja tu comentario
                 </Form.Label>
                 <Form.Select
                   aria-label="Rating"
@@ -270,4 +279,5 @@ function ProductScreen() {
     </div>
   );
 }
+
 export default ProductScreen;

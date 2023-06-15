@@ -11,6 +11,7 @@ import MessageBox from "../Components/MessageBox";
 import { Store } from "../Context/Store";
 import { getError } from "../Components/Error";
 
+// Reducer para manejar los estados y acciones relacionados con la carga y actualización del usuario
 const reducer = (state, action) => {
   switch (action.type) {
     case "FETCH_REQUEST":
@@ -31,6 +32,7 @@ const reducer = (state, action) => {
 };
 
 export default function UserEditScreen() {
+  // Definir el estado inicial y el reducer para manejar los estados y acciones
   const [{ loading, error, loadingUpdate }, dispatch] = useReducer(reducer, {
     loading: true,
     error: "",
@@ -51,9 +53,13 @@ export default function UserEditScreen() {
     const fetchData = async () => {
       try {
         dispatch({ type: "FETCH_REQUEST" });
+        
+        // Realizar la solicitud GET para obtener los datos del usuario
         const { data } = await axios.get(`/api/users/${userId}`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
+        
+        // Actualizar los estados con los datos obtenidos
         setName(data.name);
         setEmail(data.email);
         setIsAdmin(data.isAdmin);
@@ -72,6 +78,8 @@ export default function UserEditScreen() {
     e.preventDefault();
     try {
       dispatch({ type: "UPDATE_REQUEST" });
+      
+      // Realizar la solicitud PUT para actualizar los datos del usuario
       await axios.put(
         `/api/users/${userId}`,
         { _id: userId, name, email, isAdmin },
@@ -79,16 +87,20 @@ export default function UserEditScreen() {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         }
       );
+      
+      // Mostrar una notificación de éxito y redirigir a la lista de usuarios
       dispatch({
         type: "UPDATE_SUCCESS",
       });
-      toast.success("¡Usuario actualizado con exito!");
+      toast.success("¡Usuario actualizado con éxito!");
       navigate("/admin/users");
     } catch (error) {
+      // Mostrar una notificación de error y actualizar el estado
       toast.error(getError(error));
       dispatch({ type: "UPDATE_FAIL" });
     }
   };
+
   return (
     <Container className="small-container">
       <Helmet>
@@ -99,6 +111,7 @@ export default function UserEditScreen() {
       {loading ? (
         <LoadingBox></LoadingBox>
       ) : error ? (
+        // Mostrar un mensaje de error si ocurre algún error al obtener los datos del usuario
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
         <Form onSubmit={submitHandler}>
@@ -130,6 +143,7 @@ export default function UserEditScreen() {
           />
 
           <div className="mb-3">
+            {/* Botón para actualizar la información del usuario */}
             <Button disabled={loadingUpdate} type="submit">
               Actulizar información
             </Button>

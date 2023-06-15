@@ -13,6 +13,7 @@ import Button from "react-bootstrap/Button";
 import Product from "../../Components/Product/Product";
 import LinkContainer from "react-router-bootstrap/LinkContainer";
 
+// Función reductora para la gestión del estado.
 const reducer = (state, action) => {
   switch (action.type) {
     case "FETCH_REQUEST":
@@ -28,12 +29,12 @@ const reducer = (state, action) => {
       };
     case "FETCH_FAIL":
       return { ...state, loading: false, error: action.payload };
-
     default:
       return state;
   }
 };
 
+// Array de rangos de precios
 const prices = [
   {
     name: "$1 to $50",
@@ -49,22 +50,20 @@ const prices = [
   },
 ];
 
+// variedad de opciones de calificación
 export const ratings = [
   {
     name: "4stars & up",
     rating: 4,
   },
-
   {
     name: "3stars & up",
     rating: 3,
   },
-
   {
     name: "2stars & up",
     rating: 2,
   },
-
   {
     name: "1stars & up",
     rating: 1,
@@ -74,20 +73,22 @@ export const ratings = [
 export default function SearchScreen() {
   const navigate = useNavigate();
   const { search } = useLocation();
-  const sp = new URLSearchParams(search); // /search?category=Shirts
-  const category = sp.get("category") || "all";
-  const query = sp.get("query") || "all";
-  const price = sp.get("price") || "all";
-  const rating = sp.get("rating") || "all";
-  const order = sp.get("order") || "newest";
-  const page = sp.get("page") || 1;
+  const sp = new URLSearchParams(search); // Analizar la cadena de consulta de búsqueda
+  const category = sp.get("category") || "all"; // Obtenga la categoría de la consulta o configúrela en "todos"
+  const query = sp.get("query") || "all"; // Obtenga la consulta de la consulta o configúrela en "todos"
+  const price = sp.get("price") || "all"; // Obtenga el precio de la consulta o configúrelo en "todos"
+  const rating = sp.get("rating") || "all"; // Obtenga la calificación de la consulta o configúrela en "todos"
+  const order = sp.get("order") || "newest"; // Obtenga el pedido de la consulta o configúrelo como "más reciente"
+  const page = sp.get("page") || 1; // Obtenga el número de página de la consulta o configúrelo en 1
 
+  // Inicializar el estado usando la función reductora
   const [{ loading, error, products, pages, countProducts }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: "",
     });
 
+  // Obtener productos según los filtros de búsqueda
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -105,6 +106,7 @@ export default function SearchScreen() {
     fetchData();
   }, [category, error, order, page, price, query, rating]);
 
+  // Obtener categorías para filtrar
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const fetchCategories = async () => {
@@ -118,6 +120,7 @@ export default function SearchScreen() {
     fetchCategories();
   }, [dispatch]);
 
+  // Función para generar la URL del filtro en función de los filtros actuales y omitir el nombre de la ruta si es necesario
   const getFilterUrl = (filter, skipPathname) => {
     const filterPage = filter.page || page;
     const filterCategory = filter.category || category;
@@ -129,6 +132,7 @@ export default function SearchScreen() {
       skipPathname ? "" : "/search?"
     }category=${filterCategory}&query=${filterQuery}&price=${filterPrice}&rating=${filterRating}&order=${sortOrder}&page=${filterPage}`;
   };
+
   return (
     <div>
       <Helmet>

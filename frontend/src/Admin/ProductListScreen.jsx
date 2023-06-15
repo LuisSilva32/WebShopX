@@ -10,6 +10,7 @@ import LoadingBox from "../Components/LoadingBox";
 import MessageBox from "../Components/MessageBox";
 import { getError } from "../Components/Error";
 
+// Reducer para manejar los estados y acciones relacionados con la carga y actualización de los productos
 const reducer = (state, action) => {
   switch (action.type) {
     case "FETCH_REQUEST":
@@ -53,6 +54,7 @@ const reducer = (state, action) => {
 };
 
 export default function ProductListScreen() {
+  // Definir el estado inicial y el reducer para manejar los estados y acciones
   const [
     {
       loading,
@@ -80,15 +82,25 @@ export default function ProductListScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await axios.get(`/api/products/admin?page=${page} `, {
+        dispatch({ type: "FETCH_REQUEST" });
+        
+        // Realizar la solicitud GET para obtener los productos de la página especificada
+        const { data } = await axios.get(`/api/products/admin?page=${page}`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
-
+        
+        // Actualizar los estados con los datos obtenidos
         dispatch({ type: "FETCH_SUCCESS", payload: data });
-      } catch (err) {}
+      } catch (err) {
+        dispatch({
+          type: "FETCH_FAIL",
+          payload: getError(err),
+        });
+      }
     };
 
     if (successDelete) {
+      // Reiniciar el estado si se ha eliminado exitosamente un producto
       dispatch({ type: "DELETE_RESET" });
     } else {
       fetchData();
@@ -96,9 +108,11 @@ export default function ProductListScreen() {
   }, [page, userInfo, successDelete]);
 
   const createHandler = async () => {
-    if (window.confirm("¿Deseas agregar un nuevo porducto?")) {
+    if (window.confirm("¿Deseas agregar un nuevo producto?")) {
       try {
         dispatch({ type: "CREATE_REQUEST" });
+        
+        // Realizar la solicitud POST para crear un nuevo producto
         const { data } = await axios.post(
           "/api/products",
           {},
@@ -106,31 +120,36 @@ export default function ProductListScreen() {
             headers: { Authorization: `Bearer ${userInfo.token}` },
           }
         );
-        toast.success("¡Producto agragado exitosamente!");
+        
+        // Mostrar una notificación de éxito y redirigir a la página de edición del nuevo producto
+        toast.success("¡Producto agregado exitosamente!");
         dispatch({ type: "CREATE_SUCCESS" });
         navigate(`/admin/product/${data.product._id}`);
       } catch (err) {
-        toast.error(getError(error));
-        dispatch({
-          type: "CREATE_FAIL",
-        });
+        // Mostrar una notificación de error si ocurre algún error al crear el producto
+        toast.error(getError(err));
+        dispatch({ type: "CREATE_FAIL" });
       }
     }
   };
 
   const deleteHandler = async (product) => {
-    if (window.confirm("¿Estas seguro de eliminar este producto?")) {
+    if (window.confirm("¿Estás seguro de eliminar este producto?")) {
       try {
+        dispatch({ type: "DELETE_REQUEST" });
+        
+        // Realizar la solicitud DELETE para eliminar el producto seleccionado
         await axios.delete(`/api/products/${product._id}`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
-        toast.success("¡Producto eliminado con exito!");
+        
+        // Mostrar una notificación de éxito si el producto se elimina correctamente
+        toast.success("¡Producto eliminado exitosamente!");
         dispatch({ type: "DELETE_SUCCESS" });
       } catch (err) {
-        toast.error(getError(error));
-        dispatch({
-          type: "DELETE_FAIL",
-        });
+        // Mostrar una notificación de error si ocurre algún error al eliminar el producto
+        toast.error(getError(err));
+        dispatch({ type: "DELETE_FAIL" });
       }
     }
   };
@@ -143,6 +162,7 @@ export default function ProductListScreen() {
         </Col>
         <Col className="col text-end">
           <div>
+            {/* Botón para agregar un nuevo producto */}
             <Button type="button" onClick={createHandler}>
               Agregar un nuevo producto
             </Button>
@@ -156,6 +176,7 @@ export default function ProductListScreen() {
       {loading ? (
         <LoadingBox></LoadingBox>
       ) : error ? (
+        // Mostrar un mensaje de error si ocurre algún error al obtener los productos
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
         <>
@@ -165,7 +186,7 @@ export default function ProductListScreen() {
                 <th>Id</th>
                 <th>Nombre:</th>
                 <th>Precio:</th>
-                <th>Categoria:</th>
+                <th>Categoría:</th>
                 <th>Marca:</th>
                 <th>Opciones:</th>
               </tr>
@@ -179,6 +200,7 @@ export default function ProductListScreen() {
                   <td>{product.category}</td>
                   <td>{product.brand}</td>
                   <td>
+                    {/* Botones para editar y eliminar un producto */}
                     <Button
                       className="btn-editar"
                       type="button"
@@ -202,6 +224,7 @@ export default function ProductListScreen() {
             </tbody>
           </table>
           <div>
+            {/* Enlaces de paginación */}
             {[...Array(pages).keys()].map((x) => (
               <Link
                 className={x + 1 === Number(page) ? "btn text-bold" : "btn"}
