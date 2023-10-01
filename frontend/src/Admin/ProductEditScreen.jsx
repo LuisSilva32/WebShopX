@@ -39,6 +39,7 @@ const reducer = (state, action) => {
       return state;
   }
 };
+
 export default function ProductEditScreen() {
   const navigate = useNavigate();
   const params = useParams(); // /product/:id
@@ -60,6 +61,17 @@ export default function ProductEditScreen() {
   const [countInStock, setCountInStock] = useState("");
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
+
+  // Estados para mensajes de advertencia
+  const [nameError, setNameError] = useState("");
+  const [slugError, setSlugError] = useState("");
+  const [priceError, setPriceError] = useState("");
+  const [imageError, setImageError] = useState("");
+  const [categoryError, setCategoryError] = useState("");
+  const [brandError, setBrandError] = useState("");
+  const [countInStockError, setCountInStockError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -83,8 +95,78 @@ export default function ProductEditScreen() {
     };
     fetchData();
   }, [productId]);
+
   const submitHandler = async (e) => {
     e.preventDefault();
+
+    // Limpia los mensajes de advertencia previos
+    setNameError("");
+    setSlugError("");
+    setPriceError("");
+    setImageError("");
+    setCategoryError("");
+    setBrandError("");
+    setCountInStockError("");
+    setDescriptionError("");
+
+    let isValid = true;
+
+    // Validación del nombre
+    if (name.length < 3) {
+      setNameError("El nombre debe tener al menos 3 caracteres");
+      isValid = false;
+    }
+
+    // Validación del link (slug)
+    if (slug.length < 3) {
+      setSlugError("El link debe tener al menos 3 caracteres");
+      isValid = false;
+    }
+
+    // Validación del precio
+    if (parseFloat(price) <= 1) {
+      setPriceError("El precio debe ser mayor a 1");
+      isValid = false;
+    }
+
+    // Validación de la imagen (formato y obligatoriedad)
+    if (!image) {
+      setImageError("Debe seleccionar una imagen");
+      isValid = false;
+    } else if (!/\.(jpg|jpeg|png)$/i.test(image)) {
+      setImageError("La imagen debe estar en formato JPG o PNG");
+      isValid = false;
+    }
+
+    // Validación de la categoría
+    if (category.length < 3) {
+      setCategoryError("La categoría debe tener al menos 3 caracteres");
+      isValid = false;
+    }
+
+    // Validación de la marca
+    if (brand.length < 3) {
+      setBrandError("La marca debe tener al menos 3 caracteres");
+      isValid = false;
+    }
+
+    // Validación del stock del producto
+    if (parseInt(countInStock) <= 1) {
+      setCountInStockError("El stock del producto debe ser mayor que 1");
+      isValid = false;
+    }
+
+    // Validación de la descripción (menor a 300 caracteres)
+    if (description.length >= 300) {
+      setDescriptionError("La descripción debe tener menos de 300 caracteres");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      // Al menos una validación falló, no se envía la solicitud
+      return;
+    }
+
     try {
       dispatch({ type: "UPDATE_REQUEST" });
       await axios.put(
@@ -114,7 +196,7 @@ export default function ProductEditScreen() {
       dispatch({ type: "UPDATE_FAIL" });
     }
   };
-  
+
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
     const bodyFormData = new FormData();
@@ -156,6 +238,7 @@ export default function ProductEditScreen() {
               onChange={(e) => setName(e.target.value)}
               required
             />
+            {nameError && <div className="text-danger">{nameError}</div>}
           </Form.Group>
           <Form.Group className="mb-3" controlId="slug">
             <Form.Label>Link:</Form.Label>
@@ -164,14 +247,16 @@ export default function ProductEditScreen() {
               onChange={(e) => setSlug(e.target.value)}
               required
             />
+            {slugError && <div className="text-danger">{slugError}</div>}
           </Form.Group>
-          <Form.Group className="mb-3" controlId="name">
+          <Form.Group className="mb-3" controlId="price">
             <Form.Label>Precio: </Form.Label>
             <Form.Control
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required
             />
+            {priceError && <div className="text-danger">{priceError}</div>}
           </Form.Group>
           <Form.Group className="mb-3" controlId="image">
             <Form.Label>Imagen:</Form.Label>
@@ -180,9 +265,10 @@ export default function ProductEditScreen() {
               onChange={(e) => setImage(e.target.value)}
               required
             />
+            {imageError && <div className="text-danger">{imageError}</div>}
           </Form.Group>
           <Form.Group className="mb-3" controlId="imageFile">
-            <Form.Label>Actulizar imagen:</Form.Label>
+            <Form.Label>Actualizar imagen:</Form.Label>
             <Form.Control type="file" onChange={uploadFileHandler} />
             {loadingUpload && <LoadingBox></LoadingBox>}
           </Form.Group>
@@ -194,6 +280,9 @@ export default function ProductEditScreen() {
               onChange={(e) => setCategory(e.target.value)}
               required
             />
+            {categoryError && (
+              <div className="text-danger">{categoryError}</div>
+            )}
           </Form.Group>
           <Form.Group className="mb-3" controlId="brand">
             <Form.Label>Marca:</Form.Label>
@@ -202,6 +291,7 @@ export default function ProductEditScreen() {
               onChange={(e) => setBrand(e.target.value)}
               required
             />
+            {brandError && <div className="text-danger">{brandError}</div>}
           </Form.Group>
           <Form.Group className="mb-3" controlId="countInStock">
             <Form.Label>Stock del producto:</Form.Label>
@@ -210,14 +300,20 @@ export default function ProductEditScreen() {
               onChange={(e) => setCountInStock(e.target.value)}
               required
             />
+            {countInStockError && (
+              <div className="text-danger">{countInStockError}</div>
+            )}
           </Form.Group>
           <Form.Group className="mb-3" controlId="description">
-            <Form.Label>Descripcíon:</Form.Label>
+            <Form.Label>Descripción:</Form.Label>
             <Form.Control
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
             />
+            {descriptionError && (
+              <div className="text-danger">{descriptionError}</div>
+            )}
           </Form.Group>
           <div className="mb-3">
             <Button disabled={loadingUpdate} type="submit">
@@ -230,3 +326,4 @@ export default function ProductEditScreen() {
     </Container>
   );
 }
+

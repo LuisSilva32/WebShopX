@@ -1,17 +1,17 @@
-//Creamos el servidor web utilizando "Express"
-//Hacemos las importaciones necesarias
-import express from "express"; //Es un framework para Node.js
-import mongoose from "mongoose"; //Es una herramienta de modelado de objetos para MongoDB
-import dotenv from "dotenv"; //La utilizamos para cargar variables de entorno desde el archivo ".env"
+// server.js
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import config from "./DB/config.js"; // Archivo de configuración
+
 import productRouter from "./routes/productRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import orderRouter from "./routes/orderRoutes.js";
 import uploadRouter from "./routes/uploadRoutes.js";
 
-//Lamamos a la función "dotenv.config()"
 dotenv.config();
 
-//Nos conectamos a la base de datos
+// Conexión a la base de datos
 mongoose
   .connect(process.env.MONGODB_URI) //Utilizamos la variable de entorno "MONGODB_URI"
   .then(() => {
@@ -21,25 +21,26 @@ mongoose
     console.log(err.message); //Si no es exitosa mandamos mensaje de error
   });
 
-//Creamos una instancia de Express
 const app = express();
 
-app.use(express.json()); //Es un middleware utilizado para analizar solicitudes HTTP con formato JSON
-app.use(express.urlencoded({ extended: true })); //Es un middleware que se utiliza para analizar las solicitudes HTTP con formato x-www-form-urlencoded
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-//Definimos las rutas utilizando los enrutadores
+// Rutas
 app.use("/api/upload", uploadRouter);
 app.use("/api/products", productRouter);
 app.use("/api/users", userRouter);
 app.use("/api/orders", orderRouter);
 
-//Definimos un middleware de manejo de errores que captura cualquier error que ocurra durante el procesamiento de una solicitud y envía una respuesta de error al cliente.
+// Middleware de manejo de errores centralizado
 app.use((err, req, res, next) => {
-  res.status(500).send({ message: err.message });
+  console.error("Error en la solicitud:", err.message);
+  res.status(500).json({ message: "Error en el servidor." });
 });
 
-//Definimos el puerto en donde se va a inicializar el servidor
-const port = process.env.PORT || 5000; //Tenemos 2 opciones el de la vairable de entorno PORT o el 5000
+const port = process.env.PORT || 5000;
+
 app.listen(port, () => {
-  console.log(`El servidor esta corriendo en http://localhost:${port}`); //Imprimimos el mensaje como link
+  console.log(`El servidor está corriendo en http://localhost:${port}`);
 });

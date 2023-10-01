@@ -1,4 +1,4 @@
-import "./Style.css"
+import "./Style.css";
 import React, { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import Form from "react-bootstrap/Form";
@@ -14,20 +14,75 @@ export default function ShippingAddressScreen() {
     userInfo,
     cart: { shippingAddress },
   } = state;
+
   const [fullName, setFullName] = useState(shippingAddress.fullName || "");
   const [address, setAddress] = useState(shippingAddress.address || "");
   const [city, setCity] = useState(shippingAddress.city || "");
   const [postalCode, setPostalCode] = useState(
     shippingAddress.postalCode || ""
   );
+  const [country, setCountry] = useState(shippingAddress.country || "");
+
+  // Estados para mensajes de advertencia
+  const [fullNameError, setFullNameError] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [cityError, setCityError] = useState("");
+  const [postalCodeError, setPostalCodeError] = useState("");
+  const [countryError, setCountryError] = useState("");
+
   useEffect(() => {
     if (!userInfo) {
       navigate("/signin?redirect=/shipping");
     }
   }, [userInfo, navigate]);
-  const [country, setCountry] = useState(shippingAddress.country || "");
+
   const submitHandler = (e) => {
     e.preventDefault();
+
+    // Limpia los mensajes de advertencia previos
+    setFullNameError("");
+    setAddressError("");
+    setCityError("");
+    setPostalCodeError("");
+    setCountryError("");
+
+    let isValid = true;
+
+    // Validación del nombre
+    if (fullName.length < 5) {
+      setFullNameError("El nombre debe tener al menos 5 caracteres");
+      isValid = false;
+    }
+
+    // Validación de la dirección
+    if (address.length < 5) {
+      setAddressError("La dirección debe tener al menos 5 caracteres");
+      isValid = false;
+    }
+
+    // Validación de la ciudad
+    if (city.length < 3) {
+      setCityError("La ciudad debe tener al menos 3 caracteres");
+      isValid = false;
+    }
+
+    // Validación del código postal
+    if (!/^\d{5}$/.test(postalCode)) {
+      setPostalCodeError("El código postal no es válido");
+      isValid = false;
+    }
+
+    // Validación del país
+    if (country.length < 3) {
+      setCountryError("El país debe tener al menos 3 caracteres");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      // Al menos una validación falló, no se envía la solicitud
+      return;
+    }
+
     ctxDispatch({
       type: "SAVE_SHIPPING_ADDRESS",
       payload: {
@@ -38,6 +93,7 @@ export default function ShippingAddressScreen() {
         country,
       },
     });
+
     localStorage.setItem(
       "shippingAddress",
       JSON.stringify({
@@ -48,8 +104,10 @@ export default function ShippingAddressScreen() {
         country,
       })
     );
+
     navigate("/payment");
   };
+
   return (
     <div>
       <Helmet>
@@ -58,61 +116,62 @@ export default function ShippingAddressScreen() {
 
       <CheckoutSteps step1 step2></CheckoutSteps>
       <div className="container small-container">
-        <h1 className="my-3">Direccion de Envío</h1>
+        <h1 className="my-3">Dirección de Envío</h1>
         <Form onSubmit={submitHandler}>
-            {/* Creamos el label para el nombre */}
           <Form.Group className="mb-3" controlId="fullName">
             <Form.Label>Nombre completo</Form.Label>
-            {/* Definimos el controlador de nombre */}
             <Form.Control
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
             />
+            {fullNameError && (
+              <div className="text-danger">{fullNameError}</div>
+            )}
           </Form.Group>
-          {/* Creamos el label para la dirección */}
           <Form.Group className="mb-3" controlId="address">
             <Form.Label>Dirección</Form.Label>
-            {/* Definimos el controlador de dirección */}
             <Form.Control
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               required
             />
+            {addressError && (
+              <div className="text-danger">{addressError}</div>
+            )}
           </Form.Group>
-          {/* Creamos el label para la ciudad */}
           <Form.Group className="mb-3" controlId="city">
             <Form.Label>Ciudad</Form.Label>
-            {/* Definimos el controlador de ciudad */}
             <Form.Control
               value={city}
               onChange={(e) => setCity(e.target.value)}
               required
             />
+            {cityError && <div className="text-danger">{cityError}</div>}
           </Form.Group>
-          {/* Creamos el label para el codigo postal */}
           <Form.Group className="mb-3" controlId="postalCode">
-            <Form.Label>Codigo postal</Form.Label>
-            {/* Definimos el controlador de codigo postal */}
+            <Form.Label>Código postal</Form.Label>
             <Form.Control
               value={postalCode}
               onChange={(e) => setPostalCode(e.target.value)}
               required
             />
+            {postalCodeError && (
+              <div className="text-danger">{postalCodeError}</div>
+            )}
           </Form.Group>
-          {/* Creamos el label para pais */}
           <Form.Group className="mb-3" controlId="country">
             <Form.Label>País</Form.Label>
-            {/* Definimos el controlador de pais */}
             <Form.Control
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               required
             />
+            {countryError && (
+              <div className="text-danger">{countryError}</div>
+            )}
           </Form.Group>
-          {/* El "mb-3" significa margin button = 3 rem */}
-          <div className="mb-3"> 
-          {/* Creamos el boton para continuar */}
+          <div className="mb-3">
             <Button variant="primary" type="submit">
               Continuar
             </Button>
