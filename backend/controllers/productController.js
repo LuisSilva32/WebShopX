@@ -7,6 +7,10 @@ export const getAllProducts = expressAsyncHandler(async (req, res) => {
   await productService.getAllProducts(req, res);
 });
 
+export const getAllProductsAdmin = expressAsyncHandler(async (req, res) => {
+  await productService.getAllProductsAdmin(req, res);
+});
+
 export const createProduct = expressAsyncHandler(async (req, res) => {
   await productService.createProduct(req, res);
 });

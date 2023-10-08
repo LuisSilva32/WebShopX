@@ -67,10 +67,7 @@ export default function ShippingAddressScreen() {
     }
 
     // Validación del código postal
-    if (!/^\d{5}$/.test(postalCode)) {
-      setPostalCodeError("El código postal no es válido");
-      isValid = false;
-    }
+  
 
     // Validación del país
     if (country.length < 3) {

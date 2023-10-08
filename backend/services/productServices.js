@@ -9,6 +9,26 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
+const PAGE_SIZE = 6;
+export const getAllProductsAdmin = async (req, res) => {
+  const { query } = req; //Obtenemos los parametros de busqueda de la solicitud HTTP con "req.query"
+  const page = query.page || 1; //Definimos el parametro para la pagina actual
+  const pageSize = query.pageSize || PAGE_SIZE; //Definimos el tamaño de la pagina
+  //Realizamos la consulta en la base de datos
+  const products = await Product.find()
+    .skip(pageSize * (page - 1)) //Utilizamos "Skip" para saltar los productos que ya hemos mostrado en paginas anteriores, es decir para que no se repitan
+    .limit(pageSize); //Utilizamos "limit" para limitar el número de productos que se devuelven en cada página
+
+  const countProducts = await Product.countDocuments(); //Contamos el número total de productos en la base de datos utilizando el método "countDocuments" del modelo "Product"
+  //Enviamos la respuesta HTTP en formato JSON que contiene todo lo anterior
+  res.send({
+    products,
+    countProducts,
+    page,
+    pages: Math.ceil(countProducts / pageSize),
+  });
+};
+
 export const createProduct = async (req, res) => {
   try {
     const newProduct = new Product({
@@ -106,7 +126,9 @@ export const getProductsByCategory = async (req, res) => {
     const products = await Product.find({ category });
     res.send(products);
   } catch (error) {
-    res.status(500).send({ message: "Error al obtener productos por categoría." });
+    res
+      .status(500)
+      .send({ message: "Error al obtener productos por categoría." });
   }
 };
 
@@ -141,6 +163,8 @@ export const getCategories = async (req, res) => {
     const categories = await Product.find().distinct("category");
     res.send(categories);
   } catch (error) {
-    res.status(500).send({ message: "Error al obtener las categorías de productos." });
+    res
+      .status(500)
+      .send({ message: "Error al obtener las categorías de productos." });
   }
 };

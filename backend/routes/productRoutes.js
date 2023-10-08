@@ -11,6 +11,13 @@ productRoutes.get("/", async (req, res) => {
   res.send(products);
 });
 
+productRoutes.get(
+  "/admin",
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(productController.getAllProductsAdmin)
+);
+
 productRoutes.post(
   "/",
   isAuth,
@@ -38,13 +45,24 @@ productRoutes.post(
   expressAsyncHandler(productController.createProductReview)
 );
 
-productRoutes.get("/categories", expressAsyncHandler(productController.getCategories));
+productRoutes.get(
+  "/categories",
+  expressAsyncHandler(productController.getCategories)
+);
 
-productRoutes.get("/slug/:slug", expressAsyncHandler(productController.getProductBySlug));
+productRoutes.get(
+  "/slug/:slug",
+  expressAsyncHandler(productController.getProductBySlug)
+);
 
-productRoutes.get("/:id", expressAsyncHandler(productController.getProductById));
+productRoutes.get(
+  "/:id",
+  expressAsyncHandler(productController.getProductById)
+);
 
-productRoutes.get("/category", expressAsyncHandler(productController.getProductsByCategory));
+productRoutes.get(
+  "/category",
+  expressAsyncHandler(productController.getProductsByCategory)
+);
 
 export default productRoutes;
-

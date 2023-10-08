@@ -124,7 +124,9 @@ export const updateUserProfile = async (req, res) => {
       res.status(404).send({ message: "¡Usuario no encontrado!" });
     }
   } catch (error) {
-    res.status(500).send({ message: "Error al actualizar el perfil del usuario." });
+    res
+      .status(500)
+      .send({ message: "Error al actualizar el perfil del usuario." });
   }
 };
 
@@ -137,6 +139,8 @@ export const checkEmail = async (req, res) => {
       res.status(200).send({ exists: false });
     }
   } catch (error) {
-    res.status(500).send({ message: "Error al verificar el correo electrónico." });
+    res
+      .status(500)
+      .send({ message: "Error al verificar el correo electrónico." });
   }
 };
