@@ -1,98 +1,46 @@
 import Order from "../models/orderModel.js";
 
-export const getAllOrders = async (req, res) => {
+export const getAllOrders = async () => {
   try {
-    const orders = await Order.find().populate("user", "name");
-    res.send(orders);
+    return await Order.find().populate("user", "name");
   } catch (error) {
-    res.status(500).send({ message: "Error al obtener las órdenes." });
+    throw new Error("Error al obtener las órdenes.");
   }
 };
 
-export const createOrder = async (req, res) => {
+export const createOrder = async (orderData, userId) => {
   try {
     const newOrder = new Order({
-      orderItems: req.body.orderItems.map((x) => ({ ...x, product: x._id })),
-      shippingAddress: req.body.shippingAddress,
-      paymentMethod: req.body.paymentMethod,
-      itemsPrice: req.body.itemsPrice,
-      shippingPrice: req.body.shippingPrice,
-      taxPrice: req.body.taxPrice,
-      totalPrice: req.body.totalPrice,
-      user: req.user._id,
+      ...orderData,
+      user: userId,
     });
-    const order = await newOrder.save();
-    res.status(201).send({ message: "¡Nueva orden creada!", order });
+    return await newOrder.save();
   } catch (error) {
-    res.status(500).send({ message: "Error al crear la orden." });
+    throw new Error("Error al crear la orden.");
   }
 };
 
 export const getOrderSummary = async (req, res) => {
   try {
-    const orders = await Order.aggregate([
-      {
-        $group: {
-          _id: null,
-          numOrders: { $sum: 1 },
-          totalSales: { $sum: "$totalPrice" },
-        },
-      },
-    ]);
-
-    const users = await User.aggregate([
-      {
-        $group: {
-          _id: null,
-          numUsers: { $sum: 1 },
-        },
-      },
-    ]);
-
-    const dailyOrders = await Order.aggregate([
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          orders: { $sum: 1 },
-          sales: { $sum: "$totalPrice" },
-        },
-      },
-      { $sort: { _id: 1 } },
-    ]);
-
-    const productCategories = await Product.aggregate([
-      {
-        $group: {
-          _id: "$category",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-
-    res.send({ users, orders, dailyOrders, productCategories });
+    const data = await getOrderSummary();
+    res.send(data);
   } catch (error) {
-    res.status(500).send({ message: "Error al obtener el resumen." });
+    res.status(500).send({ message: error.message });
   }
 };
 
-export const getUserOrders = async (req, res) => {
+export const getUserOrders = async (userId) => {
   try {
-    const orders = await Order.find({ user: req.user._id });
-    res.send(orders);
+    return await Order.find({ user: userId });
   } catch (error) {
-    res.status(500).send({ message: "Error al obtener las órdenes del usuario." });
+    throw new Error("Error al obtener las órdenes del usuario.");
   }
 };
 
-export const getOrderById = async (req, res) => {
+export const getOrderById = async (orderId) => {
   try {
-    const order = await Order.findById(req.params.id);
-    if (order) {
-      res.send(order);
-    } else {
-      res.status(404).send({ message: "¡Orden no encontrada!" });
-    }
+    return await Order.findById(orderId);
   } catch (error) {
-    res.status(500).send({ message: "Error al obtener la orden por ID." });
+    throw new Error("Error al obtener la orden por ID.");
   }
 };

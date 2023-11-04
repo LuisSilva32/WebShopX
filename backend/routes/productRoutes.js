@@ -1,7 +1,7 @@
 import express from "express";
 import Product from "../models/productModel.js";
 import expressAsyncHandler from "express-async-handler";
-import * as productController from "../controllers/productController.js";
+import * as productServices from "../services/productServices.js";
 import { isAuth, isAdmin } from "../utils.js";
 
 const productRoutes = express.Router();
@@ -15,54 +15,59 @@ productRoutes.get(
   "/admin",
   isAuth,
   isAdmin,
-  expressAsyncHandler(productController.getAllProductsAdmin)
+  expressAsyncHandler(productServices.getAllProductsAdmin)
 );
 
 productRoutes.post(
   "/",
   isAuth,
   isAdmin,
-  expressAsyncHandler(productController.createProduct)
+  expressAsyncHandler(productServices.createProduct)
 );
 
 productRoutes.put(
   "/:id",
   isAuth,
   isAdmin,
-  expressAsyncHandler(productController.updateProduct)
+  expressAsyncHandler(productServices.updateProduct)
 );
 
 productRoutes.delete(
   "/:id",
   isAuth,
   isAdmin,
-  expressAsyncHandler(productController.deleteProduct)
+  expressAsyncHandler(productServices.deleteProduct)
 );
 
 productRoutes.post(
   "/:id/reviews",
   isAuth,
-  expressAsyncHandler(productController.createProductReview)
+  expressAsyncHandler(productServices.createProductReview)
+);
+
+productRoutes.get(
+  "/search",
+  expressAsyncHandler(productServices.getProductSearch)
 );
 
 productRoutes.get(
   "/categories",
-  expressAsyncHandler(productController.getCategories)
+  expressAsyncHandler(productServices.getCategories)
 );
 
 productRoutes.get(
   "/slug/:slug",
-  expressAsyncHandler(productController.getProductBySlug)
+  expressAsyncHandler(productServices.getProductBySlug)
 );
 
 productRoutes.get(
   "/:id",
-  expressAsyncHandler(productController.getProductById)
+  expressAsyncHandler(productServices.getProductById)
 );
 
 productRoutes.get(
   "/category",
-  expressAsyncHandler(productController.getProductsByCategory)
+  expressAsyncHandler(productServices.getProductsByCategory)
 );
 
 export default productRoutes;
