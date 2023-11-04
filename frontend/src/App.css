@@ -1,7 +1,3 @@
-/*Contenedor de la pagina*/
-.site-containaer {
-  min-height: 100vh;
-}
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",

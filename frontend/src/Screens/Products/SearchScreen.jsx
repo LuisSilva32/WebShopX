@@ -98,7 +98,7 @@ export default function SearchScreen() {
       } catch (err) {
         dispatch({
           type: "FETCH_FAIL",
-          payload: getError(error),
+          payload: getError(err),
         });
       }
     };
@@ -256,12 +256,12 @@ export default function SearchScreen() {
                   </select>
                 </Col>
               </Row>
-              {products.length === 0 && (
+              {products && products.length === 0 && (
                 <MessageBox>¡Sin resultados!</MessageBox>
               )}
 
               <Row>
-                {products.map((product) => (
+                {products && products.map((product) => (
                   <Col sm={4} lg={4} className="mb-3" key={product._id}>
                     <Product product={product}></Product>
                   </Col>
